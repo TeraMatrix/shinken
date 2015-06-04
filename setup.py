@@ -283,17 +283,17 @@ if 'win' in sys.platform:
     data_files = []
 elif 'linux' in sys.platform or 'sunos5' in sys.platform:
     default_paths = {
-        'bin':     install_scripts or "/usr/bin",
-        'var':     "/var/lib/shinken/",
-        'share':   "/var/lib/shinken/share",
-        'etc':     "/etc/shinken",
-        'run':     "/var/run/shinken",
-        'log':     "/var/log/shinken",
-        'libexec': "/var/lib/shinken/libexec",
+        'bin':     "/opt/shinken-poc/shpoc/bin",
+        'var':     "/opt/shinken-poc/shpoc/var/lib/shinken/",
+        'share':   "/opt/shinken-poc/shpoc/var/lib/shinken/share",
+        'etc':     "/opt/shinken-poc/shpoc/etc/shinken",
+        'run':     "/opt/shinken-poc/shpoc/var/run/shinken",
+        'log':     "/opt/shinken-poc/shpoc/var/log/shinken",
+        'libexec': "/opt/shinken-poc/shpoc/var/lib/shinken/libexec",
         }
     data_files = [
         (
-            os.path.join('/etc', 'init.d'),
+            os.path.join('/opt/shinken-poc/shpoc/etc', 'init.d'),
             ['bin/init.d/shinken',
              'bin/init.d/shinken-arbiter',
              'bin/init.d/shinken-broker',
@@ -308,7 +308,7 @@ elif 'linux' in sys.platform or 'sunos5' in sys.platform:
     if is_install:
         # warning: The default file will be generated a bit later
         data_files.append(
-            (os.path.join('/etc', 'default',),
+            (os.path.join('/opt/shinken-poc/shpoc/etc', 'default',),
              ['build/bin/default/shinken']
              ))
 elif 'bsd' in sys.platform or 'dragonfly' in sys.platform:
@@ -370,9 +370,31 @@ if os.name != 'nt' and not is_update:
         inifile = _file
         outname = os.path.join('build', _file)
         # force the user setting as it's not set by default
-        append_file_with(inifile, outname, "modules_dir=%s\nuser=%s\ngroup=%s\n" % (
+        append_file_with(
+            inifile, 
+            outname, 
+            """
+            modules_dir={0}
+            \n
+            user={1}
+            \n
+            group={2}
+            \n
+            workdir={3}
+            \n
+            logdir={4}
+            \n
+            pidfile=%(workdir)s/brokerd.pid
+            \n
+            local_log=%(logdir)s/brokerd.log
+            """.format (
                 os.path.join(default_paths['var'], 'modules'),
-                user, group))
+                user, 
+                group,
+                default_paths['run'],
+                default_paths['log']
+                )
+            )
         data_files.append( (os.path.join(default_paths['etc'], 'daemons'),
                             [outname]) )
 
@@ -483,9 +505,9 @@ if pwd and not root and is_install:
         _chmodplusx(default_paths['libexec'])
 
     # If not exists, won't raise an error there
-    _chmodplusx('/etc/init.d/shinken')
+    _chmodplusx('/opt/shinken-poc/shpoc/etc/init.d/shinken')
     for d in ['scheduler', 'broker', 'receiver', 'reactionner', 'poller', 'arbiter']:
-        _chmodplusx('/etc/init.d/shinken-'+d)
+        _chmodplusx('/opt/shinken-poc/shpoc/etc/init.d/shinken-'+d)
 
 try:
     import pycurl
