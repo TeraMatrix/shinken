@@ -61,3 +61,7 @@ def do_check_nagiosconfig():
 # Install Nagios Plugins
 
 folder `/opt/shinken-poc/shpoc/lib/nagios/`
+
+# Edit CMK configuration
+
+change the `check_submission to PIPE`
