@@ -8,7 +8,7 @@ INSTALLED_FILES
 .pydevproject
 .settings
 .gitignore
-modules/*
+#modules/*
 .ropeproject
 .coverage
 
