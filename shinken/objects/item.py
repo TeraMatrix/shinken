@@ -310,7 +310,7 @@ Like temporary attributes such as "imported_from", etc.. """
                     # Templates should keep their + inherited from their parents
                     if not self.is_tpl():
                         value = list(value)
-                        value = value[1:]
+                        value = [x for x in value if x != '+']
                     still_loop = True
 
                 # Maybe in the previous loop, we set a value, use it too
@@ -755,7 +755,7 @@ class Items(object):
                 self.add_item(i, index_items)
 
 
-    def manage_conflict(self, item, name, partial=False):
+    def manage_conflict(self, item, name):
         """
         Cheks if an object holding the same name already exists in the index.
 
@@ -774,8 +774,6 @@ class Items(object):
         """
         if item.is_tpl():
             existing = self.name_to_template[name]
-        elif partial:
-            existing = self.name_to_partial[name]
         else:
             existing = self.name_to_item[name]
         existing_prio = getattr(
@@ -912,7 +910,8 @@ class Items(object):
                    (objcls, name_property, self.get_source(item))
             item.configuration_errors.append(mesg)
         elif name in self.name_to_item:
-            item = self.manage_conflict(item, name)
+            if item.id != self.name_to_item[name].id:
+                item = self.manage_conflict(item, name)
         self.name_to_item[name] = item
         return item
 
